@@ -58,7 +58,7 @@ namespace NavianChallenge
         {
             if (cam == null) return;
 
-            if (Input.GetMouseButton(0) || Input.GetMouseButton(1))
+            if (Input.GetMouseButton(1))
             {
                 float mx = Input.GetAxis("Mouse X") * orbitSpeed;
                 float my = Input.GetAxis("Mouse Y") * orbitSpeed;
