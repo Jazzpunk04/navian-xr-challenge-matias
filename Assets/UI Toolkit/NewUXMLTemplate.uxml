@@ -1,0 +1,9 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement style="flex-grow: 1; justify-content: space-between; align-self: center;">
+        <ui:Image source="project://database/Resources/unity_builtin_extra?fileID=10305&amp;guid=0000000000000000f000000000000000&amp;type=0#Default-Checker" tint-color="rgba(94, 94, 94, 0.59)" style="height: 877px; aspect-ratio: auto; align-items: center; justify-content: space-around; align-self: center; align-content: flex-start; min-width: initial; min-height: initial; max-width: initial; max-height: initial; flex-direction: column; width: 513px;">
+            <ui:Label text="Brain Part Here" name="Title" parse-escape-sequences="true" style="align-content: auto; align-items: auto; -unity-text-align: upper-center; font-size: 32px; -unity-font-style: bold; align-self: center; justify-content: flex-start; white-space: normal;"/>
+            <ui:Label text="This is the content describing the part of the head" name="Description" parse-escape-sequences="true" style="align-content: auto; align-items: center; -unity-text-align: upper-center; font-size: 32px; -unity-font-style: normal; align-self: center; justify-content: flex-start; white-space: normal;"/>
+            <ui:Label text="Click anywhere to exit " name="out" parse-escape-sequences="true" style="align-content: auto; align-items: center; -unity-text-align: upper-center; font-size: 32px; -unity-font-style: normal; align-self: center; justify-content: flex-start; white-space: normal;"/>
+        </ui:Image>
+    </ui:VisualElement>
+</ui:UXML>

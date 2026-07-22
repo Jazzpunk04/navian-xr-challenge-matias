@@ -19,4 +19,9 @@ public class ObjectCutter : MonoBehaviour
             cut.SetCutPlaneAxis(axis, transform.position[axis]);
         }
     }
+
+    public int GetAxis()
+    {
+        return axis;
+    }
 }

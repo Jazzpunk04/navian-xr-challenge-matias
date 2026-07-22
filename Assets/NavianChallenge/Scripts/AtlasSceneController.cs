@@ -77,13 +77,12 @@ namespace NavianChallenge
         void OnGUI()
         {
             if (!showHelp) return;
-            const int w = 330, h = 116;
+            const int w = 330, h = 150;
             GUI.Box(new Rect(10, 10, w, h), "Navian XR Challenge - base scene");
             var s = new GUIStyle(GUI.skin.label) { fontSize = 12, wordWrap = true };
             GUI.Label(new Rect(22, 34, w - 24, h - 30),
-                "Drag mouse: orbit    Wheel: zoom    R: reset camera    H: hide\n\n" +
-                "The MRI volume and the 4 segmentation meshes are all loaded and\n" +
-                "aligned. Everything you build from here is up to you.", s);
+                "Left mouse drag: orbit    Wheel: zoom    R: reset camera    H: hide\n\n" +
+                "The MRI volume and the 4 segmentation meshes are all loaded and aligned. \nTry slicing the MRI and clicking on the desired part to see information about it.", s);
         }
     }
 }

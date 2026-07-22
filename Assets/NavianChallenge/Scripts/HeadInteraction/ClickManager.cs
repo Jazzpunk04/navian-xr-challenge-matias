@@ -1,35 +1,48 @@
+//using System.Diagnostics;
 using UnityEngine;
 
 public class ClickManager : MonoBehaviour
 {
     private Camera mainCamera;
     private const float RAYCAST_MAX_DISTANCE = 1000f;
+    private PopUpManager popUpManager;
 
     void Awake()
     {
         mainCamera = Camera.main;
     }
 
+    void Start()
+    {
+        popUpManager = GetComponent<PopUpManager>();
+        UnityEngine.Debug.Assert(popUpManager != null, "PopUpManager not found in the scene. Please ensure there is a PopUpManager in the scene.");
+    }
+
     void Update()
     {
         // 0 detects Left Click
-        if (Input.GetMouseButtonDown(0))
+        if (!popUpManager.IsPopUpVisible())
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit[] hits = Physics.RaycastAll(ray, RAYCAST_MAX_DISTANCE);
-
-            // Iterate through all hits to find one that's not cut away
-            foreach (RaycastHit hit in hits)
+            if (Input.GetMouseButtonDown(0))
             {
-                if (IsPointRendered(hit))
+                Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+                RaycastHit[] hits = Physics.RaycastAll(ray, RAYCAST_MAX_DISTANCE);
+
+                // Iterate through all hits to find one that's not cut away
+                foreach (RaycastHit hit in hits)
                 {
-                    // This is the GameObject you clicked on a visible part
-                    GameObject clickedObject = hit.transform.gameObject;
-                    Debug.Log("Clicked on: " + clickedObject.name);
-                    break; // Stop at the first valid hit
+                    if (IsPointRendered(hit))
+                    {
+                        // This is the GameObject you clicked on a visible part
+                        GameObject clickedObject = hit.transform.gameObject;
+                        Debug.Log("Clicked on: " + clickedObject.name);
+                        popUpManager.SetPopUpText(clickedObject.name, "This is a description for " + clickedObject.name);
+                        break; // Stop at the first valid hit
+                    }
                 }
             }
         }
+
     }
 
     /// <summary>

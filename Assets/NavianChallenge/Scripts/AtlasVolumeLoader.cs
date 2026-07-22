@@ -77,9 +77,8 @@ namespace NavianChallenge
             vol.gameObject.name = VolumeName;
 
             // Editor preview must never be written into the scene file.
-            if (!Application.isPlaying)
-                vol.gameObject.hideFlags = HideFlags.DontSave;
-
+            /*if (!Application.isPlaying)
+                vol.gameObject.hideFlags = HideFlags.DontSave;*/
             volume = vol;
         }
 
@@ -93,12 +92,12 @@ namespace NavianChallenge
         }
 
         /// <summary>Force a fresh rebuild (right-click the component → Rebuild Volume).</summary>
-        [ContextMenu("Rebuild Volume")]
-        public void RebuildVolume()
-        {
-            DestroyVolume();
-            if (Application.isPlaying) _ = LoadAsync();
-            else BuildPreview();
-        }
+        //[ContextMenu("Rebuild Volume")]
+        //public void RebuildVolume()
+        //{
+        //    DestroyVolume();
+        //    if (Application.isPlaying) _ = LoadAsync();
+        //    else BuildPreview();
+        //}
     }
 }

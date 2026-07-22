@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Image source="project://database/Resources/unity_builtin_extra?fileID=10305&amp;guid=0000000000000000f000000000000000&amp;type=0#Default-Checker" name="Image" scale-mode="StretchToFill" tint-color="rgba(108, 108, 108, 0.57)" style="width: 200px; height: 179px; align-self: flex-end; flex-direction: column; align-items: stretch; justify-content: space-around;">
+        <ui:Slider label="X Value" value="42" high-value="100" name="SliderX" style="flex-direction: column; align-items: flex-start; justify-content: space-around; align-self: stretch; align-content: flex-start;"/>
+        <ui:Slider label="Y Value" value="42" high-value="100" name="SliderY" style="flex-direction: column; justify-content: center;"/>
+        <ui:Slider label="Z Value" value="42" high-value="100" name="SliderZ" style="flex-direction: column; justify-content: center;"/>
+    </ui:Image>
+</ui:UXML>
