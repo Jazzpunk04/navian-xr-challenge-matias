@@ -21,9 +21,10 @@ public class ClickManager : MonoBehaviour
     void Update()
     {
         // 0 detects Left Click
-        if (!popUpManager.IsPopUpVisible())
+
+        if (Input.GetMouseButtonDown(0))
         {
-            if (Input.GetMouseButtonDown(0))
+            if (!popUpManager.IsPopUpVisible())
             {
                 Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
                 RaycastHit[] hits = Physics.RaycastAll(ray, RAYCAST_MAX_DISTANCE);
@@ -35,11 +36,23 @@ public class ClickManager : MonoBehaviour
                     {
                         // This is the GameObject you clicked on a visible part
                         GameObject clickedObject = hit.transform.gameObject;
-                        Debug.Log("Clicked on: " + clickedObject.name);
-                        popUpManager.SetPopUpText(clickedObject.name, "This is a description for " + clickedObject.name);
+                        ObjectCut objectCut = clickedObject.GetComponent<ObjectCut>();
+                        if (objectCut != null)
+                        {
+                            popUpManager.SetPopUpText(objectCut.name, objectCut.description);
+                        }
+                        else
+                        {
+                            Debug.Log("Clicked on: " + clickedObject.name);
+                            popUpManager.SetPopUpText(clickedObject.name, "This is a description for " + clickedObject.name);
+                        }
                         break; // Stop at the first valid hit
                     }
                 }
+            }
+            else
+            {
+                popUpManager.HidePopUp();
             }
         }
 

@@ -32,22 +32,13 @@ public class PopUpManager : MonoBehaviour
 
     void Update()
     {
-        if (isPopUpVisible && Input.GetMouseButtonDown(0))
-        {
-            HidePopUp();
-        }
     }
 
     public void SetPopUpText(string titleText, string descriptionText)
     {
-        if (uiHolder != null)
+        if (uiDocument != null)
         {
-            uiHolder.SetActive(true);
-
-        }
-        else if (uiDocument != null)
-        {
-            uiDocument.gameObject.SetActive(true);
+            uiDocument.rootVisualElement.style.display = DisplayStyle.Flex;
         }
 
         if (title != null)
@@ -67,13 +58,9 @@ public class PopUpManager : MonoBehaviour
     public void HidePopUp()
     {
         isPopUpVisible = false;
-        if (uiHolder != null)
+        if (uiDocument != null)
         {
-            uiHolder.SetActive(false);
-        }
-        else if (uiDocument != null)
-        {
-            uiDocument.gameObject.SetActive(false);
+            uiDocument.rootVisualElement.style.display = DisplayStyle.None;
         }
     }
 

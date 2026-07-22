@@ -6,6 +6,9 @@ public class CutManager : MonoBehaviour
     public GameObject cutX;
     public GameObject cutY;
     public GameObject cutZ;
+    public int cutXValue = 110;
+    public int cutYValue = 110;
+    public int cutZValue = 110;
     public UIDocument cutUIDocument;
 
     private Slider sliderX;
@@ -31,19 +34,22 @@ public class CutManager : MonoBehaviour
 
         if (sliderX != null)
         {
-            sliderX.highValue = 110;
+            sliderX.highValue = cutXValue;
+            sliderX.value = cutXValue; // Set initial value to the assigned value
             sliderX.RegisterValueChangedCallback(evt => UpdateCutValue(cutX, evt.newValue));
         }
 
         if (sliderY != null)
         {
-            sliderY.highValue = 110;
+            sliderY.highValue = cutYValue;
+            sliderY.value = cutYValue; // Set initial value to the assigned value
             sliderY.RegisterValueChangedCallback(evt => UpdateCutValue(cutY, evt.newValue));
         }
 
         if (sliderZ != null)
         {
-            sliderZ.highValue = 110;
+            sliderZ.highValue = cutZValue;
+            sliderZ.value = cutZValue; // Set initial value to the assigned value
             sliderZ.RegisterValueChangedCallback(evt => UpdateCutValue(cutZ, evt.newValue));
         }
 

@@ -3,6 +3,8 @@ using UnityEngine;
 public class ObjectCut : MonoBehaviour
 {
     private MeshRenderer mesh;
+    public string name;
+    public string description;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
