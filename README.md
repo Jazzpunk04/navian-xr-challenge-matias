@@ -1,271 +1,61 @@
-# Navian XR Engineer Challenge
+# Navian XR Engineer Challenge - Matías Gayo
 
 ![MRI volumétrica + meshes de segmentación alineados](docs/images/mri_plus_meshes.png)
-
-Escena base de Unity para el desafío técnico de **XR Engineer** de Navian. El repo es
-**autocontenido**: cloná, abrí con la versión de Unity indicada y ya vas a tener una MRI
-volumétrica + 4 estructuras 3D segmentadas, **alineadas** y listas para explorar. A partir
-de acá construís tu propia experiencia.
-
-> **Todo lo que ves acá es una base para que modifiques a gusto.** Las transfer functions,
-> los shaders, los materiales, los modos de render de la MRI, los meshes, los scripts
-> helper... **nada está bloqueado**. Cambiá lo que quieras.
-
 ---
 
 ## Índice
 
 1. [Cómo abrir el proyecto](#1-cómo-abrir-el-proyecto)
-2. [Estructura del proyecto](#2-estructura-del-proyecto)
-3. [La escena en detalle](#3-la-escena-en-detalle)
-4. [La MRI volumétrica (UnityVolumeRendering)](#4-la-mri-volumétrica-unityvolumerendering)
-5. [Los meshes y sus materiales](#5-los-meshes-y-sus-materiales)
-6. [Todo es modificable](#6-todo-es-modificable)
-7. [Dataset incluido](#7-dataset-incluido)
-8. [Sobre Meta Quest](#8-sobre-meta-quest)
-9. [Uso de IA](#9-uso-de-ia)
-10. [Entrega](#10-entrega)
-11. [Troubleshooting](#11-troubleshooting)
-12. [Licencia y créditos](#12-licencia-y-créditos)
+2. [La escena en detalle](#2-la-escena-en-detalle)
+3. [Uso de la solución propuesta](#3-uso-de-la-solución-propuesta)
+4. [Limitaciones](#4-limitaciones)
+5. [Mejoras a futuro](#5-mejoras-a-futuro)
+6. [Licencia y créditos](#6-licencia-y-créditos)
 
 ---
 
 ## 1. Cómo abrir el proyecto
 
-- **Versión de Unity:** **`6000.4.0f1`** (Unity 6). Abrilo con esa versión exacta desde
-  Unity Hub → *Add* → seleccioná la carpeta del repo.
-- **Render pipeline:** **Built-in** (no requiere ningún setup extra; no es URP ni HDRP).
-- **Escena principal:** [`Assets/NavianChallenge/Scenes/NavianChallenge_Main.unity`](Assets/NavianChallenge/Scenes/NavianChallenge_Main.unity).
-- **Pasos:**
-  1. Cloná el repo y agregalo como proyecto en Unity Hub.
-  2. Abrilo (la primera vez Unity importa los assets — puede tardar unos minutos).
-  3. Abrí la escena principal.
-- **Qué vas a ver, apenas abrís la escena (sin darle Play):** la **MRI volumétrica** (la
-  cabeza) con los **4 meshes** de segmentación adentro, todos alineados bajo un objeto raíz
-  `AtlasRoot`. El volumen lo genera automáticamente un componente `[ExecuteAlways]`; hay un
-  pequeño hitch de ~1-2 s la primera vez mientras se arma la textura 3D en la GPU.
+La solución del challenge utiliza la misma **Versión de Unity** que el proyecto base: **`6000.4.0f1`** (Unity 6), por lo que no hace falta realizar ninguna migración hacia otra versión. 
+La solución se puede correr directamente desde Unity, utilizando el "Play Mode"
 
 ---
 
-## 2. Estructura del proyecto
+## 2. La escena en detalle
 
-```
-navian-xr-challenge/
-├── README.md
-├── .gitignore
-│
-├── Assets/
-│   ├── NavianChallenge/              ← TODO lo específico del desafío
-│   │   ├── Scenes/
-│   │   │   └── NavianChallenge_Main.unity     ← ESCENA PRINCIPAL
-│   │   ├── Data/Atlas/IXI025/
-│   │   │   ├── MRI/IXI025_t1.nii.gz            ← MRI T1 (se auto-importa como VolumeDataset)
-│   │   │   └── Meshes/                          ← los 4 meshes 3D (.obj)
-│   │   │       ├── SustanciaGris.obj  SustanciaBlanca.obj  Venas.obj  Piel.obj
-│   │   ├── Materials/                 ← 1 material por estructura (editables)
-│   │   ├── Scripts/                   ← helpers de runtime (mínimos, para tocar)
-│   │   │   ├── AtlasVolumeLoader.cs        ← carga/crea la MRI (edición + Play)
-│   │   │   └── AtlasSceneController.cs     ← cámara orbital + reset + ayuda (sin show/hide)
-│   │   └── Editor/                    ← herramientas de editor (opcionales)
-│   │
-│   └── ThirdParty/                    ← librerías de terceros
-│       ├── UnityVolumeRendering/      ← volume rendering (código fuente: Scripts, Editor,
-│       │                                Shaders, Materials, Resources)
-│       ├── Nifti.NET/                 ← lector NIfTI managed (soporta .nii y .nii.gz)
-│       └── openDicom/                 ← dependencia DICOM de UVR
-│
-└── docs/images/                      ← imagen usada en este README
-```
-
-**Resumen rápido de «dónde toco X»:**
-
-| Quiero cambiar…                         | Andá a…                                                                 |
-|-----------------------------------------|-------------------------------------------------------------------------|
-| La escena                               | `Assets/NavianChallenge/Scenes/NavianChallenge_Main.unity`              |
-| Cómo se ve la MRI (colores/opacidad)    | Transfer Function editor + inspector de `MRI_Volume` (ver §4)           |
-| El shader del volumen                   | `Assets/ThirdParty/UnityVolumeRendering/Shaders/DirectVolumeRenderingShader.shader` |
-| Colores/materiales de los meshes        | `Assets/NavianChallenge/Materials/*.mat`                                |
-| Carga del volumen / cámara              | `Assets/NavianChallenge/Scripts/*.cs`                                   |
+Al entrar a la escena del desafío vamos a ver el escenario principal otrogado por navian, el cual consiste del MRI junto con los modelos de los distintos componentes (piel, materia blanca, materia gris y venas). Dichos componentes tuvieron cambios en su material para que puedan distinguirse de forma más sencilla a la hora de ejecutar el ejercicio. Se realizaron pequeños cambios en la interfaz original del challenge, principalmente para informar por el cambio de algunos controles. Además se agregaron dos interfaces nuevas las cuales se utilizan para interactuar con la escena
 
 ---
 
-## 3. La escena en detalle
+## 3. Uso de la solución propuesta
 
-Jerarquía de `NavianChallenge_Main.unity`:
+### Funcionalidad principal
 
-```
-AtlasRoot                                  (raíz común; en el origen, identidad)
-├── MeshesRoot
-│   ├── GrayMatter   (MeshFilter + MeshRenderer → GrayMatter.mat)
-│   ├── WhiteMatter  (…                          → WhiteMatter.mat)
-│   ├── Veins        (…                          → Veins.mat)
-│   └── Skin         (…                          → Skin.mat)
-├── AtlasRig
-│   ├── AtlasVolumeLoader     (crea la MRI y la parenta bajo AtlasRoot)
-│   └── AtlasSceneController  (cámara orbital + reset, ayuda en pantalla)
-└── MRI_Volume (UnityVolumeRendering)      ← lo agrega AtlasVolumeLoader al cargar la escena
-Main Camera
-Directional Light
-```
+La idea de la solución fue crear una herramienta educativa, la cual le permita al usuario investigar un cerebro humano mientras que aprende sobre las partes que lo componen. Dentro de la escena podemos ver una UI simple con la cual vamos a manejar los tres "ejes de corte" que nos van a permitir ver el interior del modelo otorgado. Una vez accedamos a la sección que nos interese, podemos clickear en el objeto para que nos de una breve descripción de que estamos viendo. 
 
-Notas:
+### Como se realizó
 
-- **`AtlasRoot`** es el ancla común: la MRI y los 4 meshes cuelgan de acá y **están alineados
-  en el mismo espacio** (movés/rotás/escalás `AtlasRoot` y se mueve todo junto). La piel es la
-  malla más externa (coincide con la superficie de la cabeza de la MRI); gris/blanca y venas
-  están adentro, en el mismo espacio.
-- **Materiales:** los 4 meshes arrancan con el **mismo material blanco opaco (default)**. Para
-  distinguir estructuras o ver las internas vas a querer darles color/transparencia — eso es
-  parte del desafío.
-- **`MRI_Volume`** se genera al cargar la escena (no se guarda en el `.unity`): la textura 3D
-  se arma en la GPU cada vez, así el repo se mantiene liviano y el volumen siempre correcto.
-  Para forzar que se rearme: click derecho en `AtlasVolumeLoader` → **Rebuild Volume**.
-- Podés reconstruir toda la escena con el menú **`Navian → Build Challenge Scene`**.
+Se utilizó el sistema de cortes de UnityVolumeRendering para permitir que el usuario pueda ver el interior del modelo. Debido a que no fue posible segmentar el objeto que se genera con el MRI, se configuraron las shaders de los objetos 3D para que imiten el corte que se realiza en el VolumeRenderedObject. Se crearon tres objetos de corte, uno por cada eje, y se asociaron a sliders en una UI para que el usuario pueda ir modificando la visualización del modelo en tiempo real. 
 
-**Controles de la escena base (en Play):** solo cámara. La escena carga la MRI y los 4 meshes
-**todos a la vez y visibles**; **a propósito no hay show/hide ni interacción sobre las
-estructuras** — eso lo implementás vos.
+## 4. Limitaciones
 
-| Tecla / acción       | Función                                          |
-|----------------------|--------------------------------------------------|
-| Arrastrar mouse      | Orbitar la cámara alrededor del atlas            |
-| Rueda del mouse      | Zoom                                             |
-| `R`                  | Resetear la cámara                                |
-| `H`                  | Mostrar/ocultar la ayuda en pantalla             |
+- **Cambios en el sistema de UI de Unity:** Debido a algunos problemas técnicos no pude utilizar los componentes de GUI de Unity, lo que hizo que necesite realizar todo con UI Document, la cual no es una herramienta compleja pero nunca tuve la necesidad de utilizarla, por lo que tuve demoras en la realización del challenge al tener que investigar un poco el uso de esta herramienta
+- **Tiempo:** Debido a que lo realizado fue un desafío para una entrevista, se entiende el motivo por el cual se otorga una semana para realizarlo, sin embargo, en el caso de que se decida continuar con el proyecto, muchas de las mejoras propuestas en la próxima sección pueden ser implementadas facilmente
+- **Colliders:** El uso de Mesh Colliders para identificar a los objetos llevó a un problema, debido a las formas que tienen los objetos 3D algunos Mesh Colliders no se registraban correctamente. Esto ocurre principalmente al querer interactuar con las venas, las cuales suelen quedar superpuestas por la materia gris
 
+## 5. Mejoras a futuro
+
+- **Mayor segmentación de los modelos y mejor descripción:** Con el uso de varios modelos distintos se puede generar un simulador más complejo que proporcione una versión más completa del cerebro que le proporcione más información al usuario
+- **Mejoras de UI:** Se utilizó una UI muy básica para poder completar el challenge, el fondo utilizado fue un sprite de muestra que se encuentra en el proyecto y las interfaces creadas no coinciden visualmente con la interfaz proporcionada por Navian para el proyecto. Lo ideal si se busca mejorar el proyecto sería definir un estilo para este y adaptar todas las interfaces a dicho estilo
+- **Mejoras de UX:** Hay dos mejoras que tuve en consideración para mejorar la experiencia del usuario:
+  1. **Cambios en la interacción con los cortes:** Al cambiar los sliders de la UI con un objeto arrastrable dentro de la escena podría facilitarle al usuario el poder realizar el corte que desea en el modelo, otorgandole una herramienta más precisa. Tambén se puede implementar un selector de cortes que le permita al usuario seleccionar cuantas herramientas de corte quiere utilizar. Ahora mismo siempre estan activas las tres, lo cual puede sobrecargar al usuario de información que no necesita si quiere realizar cortes más simples
+  2. **Cambios en la interacción con los objetos:** Actualmente puede ser poco intuitivo con que objeto estamos interactuando, debido a que no hay ningún indicador visual. Esto se puede solucionar haciendo que el objeto seleccionado haga algo cuando el mouse flote por encima de este (puede ser brillar, cambiar de color, generar un movimiento estilo "latido", etc). Esto permite que el usuario tenga una forma más intuitiva de saber que esta seleccionando
+  3. **Evolución dinámica de los modelos:** Con las herramientas adecuadas se podría generar una segmentación del modelo 3D generado por el MRI y generar los demás modelos en tiempo real, lo cual nos permitiría poder darle un valor mayor al uso del **UnityVolumeRendering**
+- **Cambio del sistema de interacción:** Como se menciona en la documentación del repositorio original del challenge, el proyecto utiliza el Unity Input Manager. El cambio al uso del Input System nos proporciona con una herramienta más compleja, lo cual permite un desarrollo más detallado a la hora de generar interacciones, lo cual es recomendable, especialmente si el proyecto busca en un futuro migrar a VR/AR 
+  
 ---
 
-## 4. La MRI volumétrica (UnityVolumeRendering)
-
-**Qué es:** la MRI se renderiza con
-[UnityVolumeRendering (mlavik1)](https://github.com/mlavik1/UnityVolumeRendering), incluida
-como **código fuente** en `Assets/ThirdParty/UnityVolumeRendering/`. El import de NIfTI usa
-`Nifti.NET` (100% managed, sin DLLs nativas), que lee `.nii.gz` de forma transparente.
-
-**De dónde sale el volumen:** `IXI025_t1.nii.gz` se auto-importa como un asset `VolumeDataset`
-(gracias al *ScriptedImporter* de UVR — si arrastrás cualquier `.nii`/`.nii.gz` al proyecto
-obtenés un dataset). El componente
-[`AtlasVolumeLoader`](Assets/NavianChallenge/Scripts/AtlasVolumeLoader.cs) toma ese dataset y
-crea el `VolumeRenderedObject` bajo `AtlasRoot`.
-
-### Cómo modificar cómo se ve la MRI
-
-- **Transfer Function (1D):** es *el* control principal (qué densidad → qué color y opacidad).
-  Seleccioná `MRI_Volume` y abrí **`Volume Rendering → 1D Transfer Function`**. También hay
-  **2D Transfer Function**.
-- **Modo de render:** en el inspector de `VolumeRenderedObject`, cambiá entre **Direct Volume
-  Rendering**, **MIP** e **Isosurface**. Por código: `volume.SetRenderMode(...)`.
-- **Ventana de visibilidad:** `volume.SetVisibilityWindow(min, max)` (o los sliders) — útil
-  para esconder piel/aire y ver el interior.
-- **Iluminación / sampling / interpolación cúbica:** `SetLightingEnabled`,
-  `SetSamplingRateMultiplier`, `SetCubicInterpolationEnabled`.
-- **Cortes:** menú **`Volume Rendering → Cross section →`** (plano, caja, esfera) y
-  **`Volume Rendering → Slice renderer`** (vistas tipo MPR).
-- **El shader del raymarch:** `Assets/ThirdParty/UnityVolumeRendering/Shaders/DirectVolumeRenderingShader.shader`
-  — HLSL/CG estándar, editable.
-
----
-
-## 5. Los meshes y sus materiales
-
-**Qué son:** 4 mallas 3D, **una por estructura** (sin fragmentar en miles de objetos), en
-formato **`.obj`** (import nativo de Unity, sin plugins).
-
-**Materiales** (en `Assets/NavianChallenge/Materials/`, shader `Standard`, editables):
-
-| Estructura        | Material          | Color            |
-|-------------------|-------------------|------------------|
-| Sustancia gris    | `GrayMatter.mat`  | blanco (default) |
-| Sustancia blanca  | `WhiteMatter.mat` | blanco (default) |
-| Venas             | `Veins.mat`       | blanco (default) |
-| Piel              | `Skin.mat`        | blanco (default) |
-
-Los 4 arrancan en **blanco default** a propósito. Hay **un material por estructura** para que
-puedas recolorearlas por separado (color, transparencia, shader) — diferenciarlas es parte del
-desafío.
-
----
-
-## 6. Todo es modificable
-
-Esta escena es un **punto de partida**, no una app cerrada. Intervenila libremente:
-
-- **Transfer functions** de la MRI (1D y 2D) → cambiá cómo se ve el volumen.
-- **Shaders** → el del volumen, los de corte, o los tuyos.
-- **Modos de render** del volumen (DVR / MIP / Isosurface), iluminación, sampling, cortes.
-- **Materiales y colores** de los 4 meshes.
-- **Los scripts helper** (`AtlasVolumeLoader`, `AtlasSceneController`) → reescribilos o
-  reemplazalos por tu arquitectura.
-- **La jerarquía y la escena** entera.
-
-No hay nada «sagrado». Lo único que pedimos es que puedas **explicar y defender** lo que entregues.
-
----
-
-## 7. Dataset incluido
-
-- **MRI:** `IXI025` T1 — 256×256×150 voxels.
-- **Estructuras (4 meshes):**
-  - `1` = sustancia gris
-  - `2` = sustancia blanca
-  - `3` = venas
-  - `4` = piel
-
-Los datos viven dentro del proyecto (`Assets/NavianChallenge/Data/Atlas/IXI025/`), por lo que
-el repo es autocontenido.
-
----
-
-## 8. Sobre Meta Quest
-
-**No hace falta Meta Quest ni ningún headset.** El desafío se evalúa desde **Desktop / Unity
-Editor**. Si querés sumar XR, bienvenido, pero no es un requisito y no penalizamos no tenerlo.
-
----
-
-## 9. Uso de IA
-
-Podés usar herramientas de IA (ChatGPT, Claude, Copilot, etc.) durante el desafío. No buscamos
-evaluar cuánto tiempo pasás escribiendo código desde cero, sino cómo pensás, cómo organizás la
-solución y cómo llevás una idea a una experiencia funcional. Todo lo que entregues tiene que
-ser algo que puedas explicar, defender y mejorar.
-
----
-
-## 10. Entrega
-
-La entrega debe ser un repositorio git con acceso publico que incluya:
-
-- Una escena Unity ejecutable en desktop.
-- Uso visible de la MRI incluida en el proyecto. Opcional: uso de los objetos 3D
-- Uso de UnityVolumeRendering o integración equivalente (opcional) dentro del proyecto base.
-- Una forma de interacción con la escena.
-- Una funcionalidad pensada para explorar, visualizar o interpretar la información médica.
-- Un README explicando:
-  - qué construiste;
-  - cómo ejecutarlo;
-  - principales decisiones técnicas;
-  - limitaciones conocidas;
-  - qué mejorarías con más tiempo.
-
----
-
-## 11. Troubleshooting
-
-- **«Recovering Scene Backups» al abrir:** es la auto-recuperación de Unity por un cierre
-  previo no limpio. Podés darle **No** (la escena del repo es la buena).
-- **Hitch de ~1-2 s al abrir la escena o recompilar:** es la generación de la textura 3D de la
-  MRI. Normal.
-- **No veo la MRI en modo edición:** seleccioná `AtlasRig` → `AtlasVolumeLoader` → click
-  derecho → **Rebuild Volume**.
-- **Consola limpia:** `Assets/csc.rsp` silencia warnings de *API deprecada* de la librería
-  UnityVolumeRendering (terceros); borralo si querés verlos en tu propio código.
-- **Aviso de Input Manager:** la escena usa el Input Manager clásico por simplicidad. Unity
-  sugiere migrar al *Input System package* — es opcional.
-
----
-
-## 12. Licencia y créditos
+## 6. Licencia y créditos
 
 - **Código propio del desafío** (escena, `Assets/NavianChallenge/`, esta documentación):
   **MIT** © Navian — ver [`LICENSE`](LICENSE).
@@ -274,3 +64,4 @@ La entrega debe ser un repositorio git con acceso publico que incluya:
 - **Dataset:** la MRI IXI025 y los meshes derivados de ella están bajo **CC BY-SA 3.0**,
   con crédito al proyecto [IXI](https://brain-development.org/ixi-dataset/). Si redistribuís
   la data o trabajos derivados, mantené la atribución y la licencia.
+- **Uso del repositorio:** En el caso que sea solicitado por los miembros de Navian, este repositorio será eliminado una vez se considere concluido el challenge
